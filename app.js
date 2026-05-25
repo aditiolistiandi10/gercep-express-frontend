@@ -37,128 +37,90 @@ function showToast(msg, type) {
   setTimeout(function() { t.remove(); }, 3000);
 }
 
-// ===== localStorage DATA MANAGER =====
+
+// 🌐 ENDPOINT MANAGEMENT
+const API_URL = "http://98.86.71.222:5000";// ⚠️ SILAHKAN GANTI URL DI BAWAH INI DENGAN INVOKE URL DARI API GATEWAY (LAMBDA) KAMU
+const LAMBDA_API_URL = "https://xyz12345.execute-api.us-east-1.amazonaws.com/prod/shipment";
+
+
+// ===== NEW API DATA MANAGER (INTEGRASI MULTI-AWS SERVICE) =====
 var DB = {
-  KEY: 'gercep_express_data',
-
-  getAll: function() {
+  // 1. Mengambil seluruh data pengiriman dari server AWS EC2
+  getAll: async function() {
     try {
-      var raw = localStorage.getItem(this.KEY);
-      return raw ? JSON.parse(raw) : this._defaultData();
-    } catch(e) { return this._defaultData(); }
-  },
-
-  saveAll: function(data) {
-    localStorage.setItem(this.KEY, JSON.stringify(data));
-  },
-
-  _defaultData: function() {
-    return {
-      pengiriman: [
-        {
-          id:'1', resi:'GE-20240521-001', tanggal:'2024-05-21T08:30:00',
-          pengirim:'Budi Santoso', telp_pengirim:'081234567890',
-          alamat_pengirim:'Jl. Sudirman No.1', kota_asal:'Jakarta',
-          penerima:'Dewi Lestari', telp_penerima:'082345678901',
-          alamat_penerima:'Jl. Pemuda No.5', kota_tujuan:'Surabaya',
-          barang:'Elektronik', kategori:'Elektronik', berat:2.5,
-          layanan:'regular', status:'delivered', ongkir:17500, total:19500,
-          nilai_barang:500000, catatan:'Fragile', estimasi:'2024-05-23'
-        },
-        {
-          id:'2', resi:'GE-20240521-002', tanggal:'2024-05-21T09:00:00',
-          pengirim:'Siti Rahayu', telp_pengirim:'083456789012',
-          alamat_pengirim:'Jl. Braga No.10', kota_asal:'Bandung',
-          penerima:'Ahmad Fauzi', telp_penerima:'084567890123',
-          alamat_penerima:'Jl. Asia No.20', kota_tujuan:'Medan',
-          barang:'Pakaian', kategori:'Pakaian', berat:1.2,
-          layanan:'express', status:'transit', ongkir:14400, total:15400,
-          nilai_barang:200000, catatan:'', estimasi:'2024-05-22'
-        },
-        {
-          id:'3', resi:'GE-20240521-003', tanggal:'2024-05-21T09:30:00',
-          pengirim:'Agus Wijaya', telp_pengirim:'085678901234',
-          alamat_pengirim:'Jl. Diponegoro No.15', kota_asal:'Surabaya',
-          penerima:'Rina Susanti', telp_penerima:'086789012345',
-          alamat_penerima:'Jl. Dago No.8', kota_tujuan:'Bandung',
-          barang:'Makanan Kering', kategori:'Makanan', berat:3.8,
-          layanan:'sameday', status:'pending', ongkir:68400, total:70400,
-          nilai_barang:300000, catatan:'Jangan ditumpuk', estimasi:'2024-05-21'
-        },
-        {
-          id:'4', resi:'GE-20240521-004', tanggal:'2024-05-21T10:00:00',
-          pengirim:'Dewi Lestari', telp_pengirim:'082345678901',
-          alamat_pengirim:'Jl. Pemuda No.5', kota_asal:'Makassar',
-          penerima:'Hendra Gunawan', telp_penerima:'087890123456',
-          alamat_penerima:'Jl. MH Thamrin No.1', kota_tujuan:'Jakarta',
-          barang:'Dokumen', kategori:'Dokumen', berat:0.8,
-          layanan:'regular', status:'delivered', ongkir:5600, total:7600,
-          nilai_barang:50000, catatan:'Rahasia', estimasi:'2024-05-24'
-        },
-        {
-          id:'5', resi:'GE-20240521-005', tanggal:'2024-05-21T10:30:00',
-          pengirim:'Rudi Hartono', telp_pengirim:'088901234567',
-          alamat_pengirim:'Jl. Malioboro No.7', kota_asal:'Yogyakarta',
-          penerima:'Maya Sari', telp_penerima:'089012345678',
-          alamat_penerima:'Jl. Pandanaran No.3', kota_tujuan:'Semarang',
-          barang:'Kerajinan Tangan', kategori:'Lainnya', berat:5.0,
-          layanan:'express', status:'transit', ongkir:60000, total:61000,
-          nilai_barang:400000, catatan:'', estimasi:'2024-05-22'
-        }
-      ]
-    };
-  },
-
-  addPengiriman: function(data) {
-    var db = this.getAll();
-    var resi = 'GE-' + new Date().toISOString().slice(0,10).replace(/-/g,'') +
-               '-' + String(Math.floor(Math.random()*900+100));
-    var newItem = Object.assign({
-      id: Date.now().toString(),
-      resi: resi,
-      tanggal: new Date().toISOString(),
-      status: 'pending'
-    }, data);
-    db.pengiriman.unshift(newItem);
-    this.saveAll(db);
-    return newItem;
-  },
-
-  updateStatus: function(resi, status) {
-    var db = this.getAll();
-    var idx = db.pengiriman.findIndex(function(p) { return p.resi === resi; });
-    if (idx >= 0) {
-      db.pengiriman[idx].status = status;
-      this.saveAll(db);
-      return true;
+      var response = await fetch(`${EC2_API_URL}/pengiriman`);
+      if (!response.ok) throw new Error('HTTP error ' + response.status);
+      var result = await response.json();
+      return result.data; 
+    } catch(e) {
+      console.error("Gagal mengambil data dari AWS EC2:", e);
+      return [];
     }
-    return false;
   },
 
-  deletePengiriman: function(resi) {
-    var db = this.getAll();
-    db.pengiriman = db.pengiriman.filter(function(p) { return p.resi !== resi; });
-    this.saveAll(db);
+  // 2. Mengirim data transaksi baru ke AWS Lambda + DynamoDB
+  addPengiriman: async function(data) {
+    try {
+      var response = await fetch(LAMBDA_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      
+      if (!response.ok) throw new Error('HTTP error ' + response.status);
+      var result = await response.json();
+      
+      showToast(result.message || "Data terkirim ke AWS!", "success");
+      // Mengembalikan data paket yang berhasil dibuat (atau fallback ke data input jika Lambda hanya merespon teks sukses)
+      return result.newItem || data;
+    } catch(e) {
+      console.error("Gagal mengirim data ke AWS Lambda:", e);
+      showToast("Gagal mengirim data ke cloud!", "error");
+      return null;
+    }
   },
 
-  stats: function() {
-    var db = this.getAll();
-    var today = new Date().toISOString().slice(0,10);
-    var todayOrders = db.pengiriman.filter(function(p) {
-      return p.tanggal.startsWith(today);
-    });
-    return {
-      total:      db.pengiriman.length,
-      todayTotal: todayOrders.length,
-      delivered:  db.pengiriman.filter(function(p) { return p.status === 'delivered'; }).length,
-      transit:    db.pengiriman.filter(function(p) { return p.status === 'transit';   }).length,
-      pending:    db.pengiriman.filter(function(p) { return p.status === 'pending';   }).length,
-      revenue:    db.pengiriman.reduce(function(s, p) { return s + (p.total || 0); }, 0),
-    };
+  // 3. Mengubah status paket (Pending / Transit / Delivered) di database AWS EC2
+  updateStatus: async function(resi, status) {
+    try {
+      var response = await fetch(`${EC2_API_URL}/pengiriman/status`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ resi: resi, status: status })
+      });
+      return response.ok;
+    } catch(e) {
+      console.error("Gagal update status di AWS EC2:", e);
+      return false;
+    }
+  },
+
+  // 4. Menghapus data transaksi dari AWS EC2
+  deletePengiriman: async function(resi) {
+    try {
+      var response = await fetch(`${EC2_API_URL}/pengiriman/${resi}`, { method: 'DELETE' });
+      return response.ok;
+    } catch(e) {
+      console.error("Gagal menghapus data di AWS EC2:", e);
+      return false;
+    }
+  },
+
+  // 5. Mengambil ringkasan statistik (pendapatan, jumlah paket) untuk halaman Laporan dari AWS EC2
+  stats: async function() {
+    try {
+      var response = await fetch(`${EC2_API_URL}/stats`);
+      if (!response.ok) throw new Error('HTTP error ' + response.status);
+      var result = await response.json();
+      return result.analytics; 
+    } catch(e) {
+      console.error("Gagal memuat statistik AWS EC2:", e);
+      return { total: 0, todayTotal: 0, delivered: 0, transit: 0, pending: 0, revenue: 0 };
+    }
   }
 };
 
-// Hitung ongkir (dipakai di pengiriman.html)
+// Hitung ongkir
 function hitungOngkirCalc(berat, panjang, lebar, tinggi, layanan) {
   var beratVol  = (panjang * lebar * tinggi) / 6000;
   var beratTagih = Math.max(parseFloat(berat) || 0, beratVol, 0.1);
