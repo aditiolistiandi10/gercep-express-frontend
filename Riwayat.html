@@ -1,0 +1,205 @@
+<!DOCTYPE html> 
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Gercep Express — Riwayat</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-brand">
+      <div class="sb-icon">⚡</div>
+      <div>
+        <div class="sb-name">GERCEP</div>
+        <div class="sb-sub">EXPRESS</div>
+      </div>
+    </div>
+    <nav class="sb-nav">
+      <a href="index.html" class="nav-item">
+        <span class="nav-ic">◈</span>
+        <span>Dashboard</span>
+      </a>
+      <a href="pengiriman.html" class="nav-item">
+        <span class="nav-ic">▶</span>
+        <span>Pengiriman</span>
+      </a>
+      <a href="lacak.html" class="nav-item">
+        <span class="nav-ic">◎</span>
+        <span>Lacak Paket</span>
+      </a>
+      <a href="riwayat.html" class="nav-item active">
+        <span class="nav-ic">≡</span>
+        <span>Riwayat</span>
+      </a>
+      <a href="laporan.html" class="nav-item">
+        <span class="nav-ic">◉</span>
+        <span>Laporan</span>
+      </a>
+    </nav>
+    <div class="sb-footer">
+      <div class="sb-avatar">A</div>
+      <div>
+        <div class="sb-uname">Admin</div>
+        <div class="sb-urole">Super Admin</div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main-wrap">
+    
+    <header class="topbar">
+      <div class="topbar-l">
+        <button class="menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+        <div class="page-title">Riwayat Pengiriman</div>
+      </div>
+      <div class="topbar-r">
+        <button class="btn btn-primary" onclick="window.location='pengiriman.html'">+ Buat Pengiriman</button>
+      </div>
+    </header>
+
+    <div class="content">
+      
+      <div class="search-bar" style="margin-bottom: 24px;">
+        <div class="search-input-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="search" placeholder="Cari resi, nama pengirim, penerima..." oninput="filterData()" />
+        </div>
+        <select class="form-control" id="filter-status" style="width:160px" onchange="filterData()">
+          <option value="">Semua Status</option>
+          <option value="delivered">Terkirim</option>
+          <option value="transit">Dalam Perjalanan</option>
+          <option value="pending">Menunggu</option>
+        </select>
+        <select class="form-control" id="filter-layanan" style="width:160px" onchange="filterData()">
+          <option value="">Semua Layanan</option>
+          <option value="regular">Regular</option>
+          <option value="express">Express</option>
+          <option value="sameday">Same Day</option>
+        </select>
+      </div>
+
+      <div class="card" style="min-width: 0;">
+        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <div class="card-title" style="font-size: 16px; font-weight: 700; margin: 0;">
+            Daftar Pengiriman <span id="total-count" style="color:var(--muted); font-weight:400; font-size:13px"></span>
+          </div>
+          <button class="btn btn-secondary" style="font-size:12px; padding:8px 14px" onclick="exportCSV()">📥 Export CSV</button>
+        </div>
+        
+        <div style="overflow-x: auto; width: 100%;">
+          <table class="data-table" style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead>
+              <tr>
+                <th>No. Resi</th>
+                <th>Tanggal</th>
+                <th>Pengirim</th>
+                <th>Penerima</th>
+                <th>Rute</th>
+                <th>Berat</th>
+                <th>Layanan</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="orders-table"></tbody>
+          </table>
+        </div>
+
+        <div id="empty-state" style="display:none; text-align:center; padding:48px; color:var(--muted)">
+          <div style="font-size:36px; margin-bottom:12px">📭</div>
+          <div>Tidak ada data pengiriman ditemukan</div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+  <script>
+    const statusBadge = {
+      delivered: '<span class="badge badge-success">Terkirim</span>',
+      transit:   '<span class="badge badge-warn">Dalam Perjalanan</span>',
+      pending:   '<span class="badge badge-info">Menunggu</span>',
+      cancel:    '<span class="badge badge-danger">Dibatalkan</span>',
+    };
+
+    const layananMap = { regular:'Regular', express:'Express', sameday:'Same Day' };
+
+    const sampleOrders = [
+      {resi:'GE-20240521-001',tanggal:'2024-05-21T08:30:00',pengirim:'Budi Santoso',penerima:'Dewi Lestari',asal:'Jakarta',tujuan:'Surabaya',berat:'2.5',layanan:'regular',status:'delivered',total:47500},
+      {resi:'GE-20240521-002',tanggal:'2024-05-21T09:00:00',pengirim:'Siti Rahayu',penerima:'Ahmad Fauzi',asal:'Bandung',tujuan:'Medan',berat:'1.2',layanan:'express',status:'transit',total:32000},
+      {resi:'GE-20240521-003',tanggal:'2024-05-21T09:30:00',pengirim:'Agus Wijaya',penerima:'Rina Susanti',asal:'Surabaya',tujuan:'Bandung',berat:'3.8',layanan:'sameday',status:'pending',total:86400},
+      {resi:'GE-20240521-004',tanggal:'2024-05-21T10:00:00',pengirim:'Dewi Lestari',penerima:'Hendra Gunawan',asal:'Makassar',tujuan:'Jakarta',berat:'0.8',layanan:'regular',status:'delivered',total:28000},
+      {resi:'GE-20240521-005',tanggal:'2024-05-21T10:30:00',pengirim:'Rudi Hartono',penerima:'Maya Sari',asal:'Yogyakarta',tujuan:'Semarang',berat:'5.0',layanan:'express',status:'transit',total:72000},
+      {resi:'GE-20240520-001',tanggal:'2024-05-20T08:00:00',pengirim:'Indah Permata',penerima:'Budi Setiawan',asal:'Jakarta',tujuan:'Denpasar',berat:'1.5',layanan:'regular',status:'delivered',total:34500},
+      {resi:'GE-20240520-002',tanggal:'2024-05-20T09:00:00',pengirim:'Joko Widodo',penerima:'Sri Mulyani',asal:'Semarang',tujuan:'Palembang',berat:'2.0',layanan:'express',status:'delivered',total:46000},
+      {resi:'GE-20240519-001',tanggal:'2024-05-19T11:00:00',pengirim:'Ani Susanto',penerima:'Bambang Sutopo',asal:'Medan',tujuan:'Jakarta',berat:'4.2',layanan:'regular',status:'delivered',total:61400},
+    ];
+
+    const stored = JSON.parse(localStorage.getItem('gercep_orders') || '[]');
+    const allOrders = [...stored.map(o => ({...o, total: Math.ceil(parseFloat(o.berat||1)) * (o.layanan==='regular'?7000:o.layanan==='express'?12000:18000) + 2000})), ...sampleOrders];
+
+    let filtered = [...allOrders];
+
+    function filterData() {
+      const q = document.getElementById('search').value.toLowerCase();
+      const status = document.getElementById('filter-status').value;
+      const layanan = document.getElementById('filter-layanan').value;
+
+      filtered = allOrders.filter(o => {
+        const matchQ = !q || o.resi.toLowerCase().includes(q) || o.pengirim.toLowerCase().includes(q) || o.penerima.toLowerCase().includes(q);
+        const matchS = !status || o.status === status;
+        const matchL = !layanan || o.layanan === layanan;
+        return matchQ && matchS && matchL;
+      });
+      renderTable();
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById('orders-table');
+      document.getElementById('total-count').textContent = `(${filtered.length} data)`;
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '';
+        document.getElementById('empty-state').style.display = 'block';
+        return;
+      }
+      document.getElementById('empty-state').style.display = 'none';
+
+      tbody.innerHTML = filtered.map(o => `
+        <tr>
+          <td class="mono">${o.resi}</td>
+          <td style="font-size:12px">${new Date(o.tanggal).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'})}</td>
+          <td>${o.pengirim}</td>
+          <td>${o.penerima}</td>
+          <td style="font-size:12px">${o.asal} → ${o.tujuan}</td>
+          <td>${o.berat} kg</td>
+          <td><span style="font-size:12px; background:var(--surface2); padding:3px 8px; border-radius:6px; border:1px solid var(--border)">${layananMap[o.layanan]||o.layanan}</span></td>
+          <td style="font-weight:600; color:var(--org)">Rp ${(o.total||0).toLocaleString('id-ID')}</td>
+          <td>${statusBadge[o.status]||''}</td>
+          <td>
+            <a href="lacak.html" class="btn btn-secondary" style="font-size:11px; padding:5px 10px">🔍 Lacak</a>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function exportCSV() {
+      const headers = ['Resi','Tanggal','Pengirim','Penerima','Asal','Tujuan','Berat','Layanan','Total','Status'];
+      const rows = filtered.map(o => [o.resi,o.tanggal,o.pengirim,o.penerima,o.asal,o.tujuan,o.berat,o.layanan,o.total,o.status].join(','));
+      const csv = [headers.join(','), ...rows].join('\n');
+      const a = document.createElement('a');
+      a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+      a.download = 'gercep-riwayat-' + new Date().toISOString().slice(0,10) + '.csv';
+      a.click();
+      if(typeof showToast === "function") showToast('CSV berhasil diunduh!');
+    }
+
+    renderTable();
+  </script>
+</body>
+</html>

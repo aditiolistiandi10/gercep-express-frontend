@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Gercep Express — Pengiriman</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+</head>
+<body style="margin: 0; padding: 0; box-sizing: border-box; font-family: 'Space Grotesk', sans-serif; background-color: #f8fafc;">
+
+  <aside class="sidebar" id="sidebar" style="position: fixed; top: 0; left: 0; bottom: 0; width: 260px; z-index: 100;">
+    <div class="sb-brand">
+      <div class="sb-icon">⚡</div>
+      <div>
+        <div class="sb-name">GERCEP</div>
+        <div class="sb-sub">EXPRESS</div>
+      </div>
+    </div>
+    <nav class="sb-nav">
+      <a href="index.html" class="nav-item">
+        <span class="nav-ic">◈</span>
+        <span>Dashboard</span>
+      </a>
+      <a href="pengiriman.html" class="nav-item active">
+        <span class="nav-ic">▶</span>
+        <span>Pengiriman</span>
+      </a>
+      <a href="lacak.html" class="nav-item">
+        <span class="nav-ic">◎</span>
+        <span>Lacak Paket</span>
+      </a>
+      <a href="riwayat.html" class="nav-item">
+        <span class="nav-ic">≡</span>
+        <span>Riwayat</span>
+      </a>
+      <a href="laporan.html" class="nav-item">
+        <span class="nav-ic">◉</span>
+        <span>Laporan</span>
+      </a>
+    </nav>
+    <div class="sb-footer">
+      <div class="sb-avatar">A</div>
+      <div>
+        <div class="sb-uname">Admin</div>
+        <div class="sb-urole">Super Admin</div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main-wrap" style="margin-left: 260px; min-height: 100vh; display: block; overflow-x: hidden;">
+    
+    <header class="topbar" style="padding: 16px 32px; background: #fff; border-bottom: 1px solid #e2e8f0;">
+      <div class="topbar-l">
+        <button class="menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+        <div class="page-title" style="font-weight: 600; font-size: 18px; color: #1e293b;">Buat Pengiriman Baru</div>
+      </div>
+    </header>
+
+    <div class="content" style="padding: 32px; box-sizing: border-box;">
+      
+      <div class="page-header" style="margin-bottom: 28px;">
+        <div>
+          <h1 style="font-size: 26px; font-weight: 700; margin: 0; color: #0f172a;">📦 Form Pengiriman</h1>
+          <p style="color: #64748b; font-size:14px; margin-top:4px">Isi data pengiriman Gercep Express secara lengkap</p>
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns: 1fr 380px; gap: 28px; min-width: 0; align-items: start;">
+        
+        <div style="min-width: 0;">
+          
+          <div class="card" style="background:#fff; padding:24px; border-radius:12px; margin-bottom:24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;">
+            <div class="card-ttl" style="margin-bottom:20px; padding-bottom:12px; border-bottom:1px solid #e2e8f0; font-weight:700; font-size: 16px; color: #1e293b;">
+              📤 Data Pengirim
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom: 16px;">
+              <div class="form-group">
+                <label class="form-label">Nama Pengirim *</label>
+                <input class="form-control-custom" id="nama-pengirim" type="text" placeholder="Masukkan nama lengkap" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">No. Telepon *</label>
+                <input class="form-control-custom" id="telp-pengirim" type="tel" placeholder="08xxxxxxxxxx" />
+              </div>
+            </div>
+            <div class="form-group" style="margin-bottom: 16px;">
+              <label class="form-label">Alamat Pengirim *</label>
+              <textarea class="form-control-custom" id="alamat-pengirim" rows="3" placeholder="Jalan, No. Rumah, RT/RW, Kelurahan..."></textarea>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;">
+              <div class="form-group">
+                <label class="form-label">Kota Asal *</label>
+                <select class="form-control-custom" id="kota-asal" onchange="autoFillWilayah('asal')">
+                  <option value="">-- Pilih Kota --</option>
+                  <option value="Jakarta">Jakarta</option>
+                  <option value="Bandung">Bandung</option>
+                  <option value="Surabaya">Surabaya</option>
+                  <option value="Medan">Medan</option>
+                  <option value="Makassar">Makassar</option>
+                  <option value="Yogyakarta">Yogyakarta</option>
+                  <option value="Semarang">Semarang</option>
+                  <option value="Palembang">Palembang</option>
+                  <option value="Denpasar">Denpasar</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Provinsi</label>
+                <input class="form-control-custom" id="prov-pengirim" type="text" placeholder="Terisi otomatis" readonly style="background: #f1f5f9; cursor: not-allowed;" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Kode Pos</label>
+                <input class="form-control-custom" id="pos-pengirim" type="text" placeholder="Terisi otomatis" readonly style="background: #f1f5f9; cursor: not-allowed;" />
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="background:#fff; padding:24px; border-radius:12px; margin-bottom:24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;">
+            <div class="card-ttl" style="margin-bottom:20px; padding-bottom:12px; border-bottom:1px solid #e2e8f0; font-weight:700; font-size: 16px; color: #1e293b;">
+              📥 Data Penerima
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom: 16px;">
+              <div class="form-group">
+                <label class="form-label">Nama Penerima *</label>
+                <input class="form-control-custom" id="nama-penerima" type="text" placeholder="Masukkan nama lengkap" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">No. Telepon *</label>
+                <input class="form-control-custom" id="telp-penerima" type="tel" placeholder="08xxxxxxxxxx" />
+              </div>
+            </div>
+            <div class="form-group" style="margin-bottom: 16px;">
+              <label class="form-label">Alamat Penerima *</label>
+              <textarea class="form-control-custom" id="alamat-penerima" rows="3" placeholder="Jalan, No. Rumah, RT/RW, Kelurahan..."></textarea>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;">
+              <div class="form-group">
+                <label class="form-label">Kota Tujuan *</label>
+                <select class="form-control-custom" id="kota-tujuan" onchange="autoFillWilayah('tujuan')">
+                  <option value="">-- Pilih Kota --</option>
+                  <option value="Jakarta">Jakarta</option>
+                  <option value="Bandung">Bandung</option>
+                  <option value="Surabaya">Surabaya</option>
+                  <option value="Medan">Medan</option>
+                  <option value="Makassar">Makassar</option>
+                  <option value="Yogyakarta">Yogyakarta</option>
+                  <option value="Semarang">Semarang</option>
+                  <option value="Palembang">Palembang</option>
+                  <option value="Denpasar">Denpasar</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Provinsi</label>
+                <input class="form-control-custom" id="prov-penerima" type="text" placeholder="Terisi otomatis" readonly style="background: #f1f5f9; cursor: not-allowed;" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Kode Pos</label>
+                <input class="form-control-custom" id="pos-penerima" type="text" placeholder="Terisi otomatis" readonly style="background: #f1f5f9; cursor: not-allowed;" />
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="background:#fff; padding:24px; border-radius:12px; margin-bottom:24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;">
+            <div class="card-ttl" style="margin-bottom:20px; padding-bottom:12px; border-bottom:1px solid #e2e8f0; font-weight:700; font-size: 16px; color: #1e293b;">
+              🎁 Detail Paket
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom: 16px;">
+              <div class="form-group">
+                <label class="form-label">Nama / Deskripsi Barang *</label>
+                <input class="form-control-custom" id="nama-barang" type="text" placeholder="contoh: Elektronik, Pakaian..." />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Kategori Barang</label>
+                <select class="form-control-custom" id="kategori">
+                  <option>Elektronik</option><option>Pakaian</option><option>Makanan</option>
+                  <option>Dokumen</option><option>Furniture</option><option>Lainnya</option>
+                </select>
+              </div>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:16px; margin-bottom: 16px;">
+              <div class="form-group">
+                <label class="form-label">Berat (kg) *</label>
+                <input class="form-control-custom" id="berat" type="number" step="0.1" min="0.1" placeholder="0.0" oninput="hitungOngkir()" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Panjang (cm)</label>
+                <input class="form-control-custom" id="panjang" type="number" placeholder="0" oninput="hitungOngkir()" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Lebar (cm)</label>
+                <input class="form-control-custom" id="lebar" type="number" placeholder="0" oninput="hitungOngkir()" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Tinggi (cm)</label>
+                <input class="form-control-custom" id="tinggi" type="number" placeholder="0" oninput="hitungOngkir()" />
+              </div>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom: 16px;">
+              <div class="form-group">
+                <label class="form-label">Nilai Barang (Rp)</label>
+                <input class="form-control-custom" id="nilai-barang" type="number" placeholder="0" oninput="hitungOngkir()" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Catatan Khusus</label>
+                <input class="form-control-custom" id="catatan" type="text" placeholder="Fragile, jangan ditumpuk, dll..." />
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="margin-bottom: 8px; display: block;">Layanan Pengiriman *</label>
+              <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px;">
+                <label class="service-opt" id="opt-regular" onclick="selectService('regular')">
+                  <input type="radio" name="service" value="regular" checked />
+                  <div class="service-name">⚡ Regular</div>
+                  <div class="service-desc">3–5 hari kerja</div>
+                  <div class="service-price" id="price-regular">Rp –</div>
+                </label>
+                <label class="service-opt" id="opt-express" onclick="selectService('express')">
+                  <input type="radio" name="service" value="express" />
+                  <div class="service-name">🚀 Express</div>
+                  <div class="service-desc">1–2 hari kerja</div>
+                  <div class="service-price" id="price-express">Rp –</div>
+                </label>
+                <label class="service-opt" id="opt-sameday" onclick="selectService('sameday')">
+                  <input type="radio" name="service" value="sameday" />
+                  <div class="service-name">⚡ Same Day</div>
+                  <div class="service-desc">Hari ini tiba</div>
+                  <div class="service-price" id="price-sameday">Rp –</div>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex; gap:12px; margin-top: 24px;">
+            <button class="btn btn-primary" onclick="submitPengiriman()" style="flex:1; justify-content:center; background:#F97316; color:#fff; border:none; padding:14px; border-radius:8px; font-weight:600; font-size:15px; cursor:pointer; transition: background 0.2s;">
+              📦 Buat Pengiriman
+            </button>
+            <button class="btn btn-secondary" onclick="resetForm()" style="padding:14px 28px; cursor:pointer; border-radius:8px; background:#e2e8f0; color:#475569; border:none; font-weight:600;">Reset</button>
+          </div>
+        </div>
+
+        <div style="min-width: 0;">
+          <div class="card" style="position:sticky; top:100px; background:#fff; padding:24px; border-radius:12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;">
+            <div class="card-ttl" style="margin-bottom:16px; font-weight:700; font-size:16px; color:#1e293b;">📋 Ringkasan Pesanan</div>
+            <div class="summary-row"><span>Jasa Pengiriman</span><strong>Gercep Express</strong></div>
+            <div class="summary-row"><span>Layanan</span><span id="sum-service" style="font-weight:500;">Regular</span></div>
+            <div class="summary-row"><span>Kota Asal</span><span id="sum-asal">—</span></div>
+            <div class="summary-row"><span>Kota Tujuan</span><span id="sum-tujuan">—</span></div>
+            <div class="summary-row"><span>Berat Aktual</span><span id="sum-berat">— kg</span></div>
+            <div class="summary-row"><span>Berat Volumetrik</span><span id="sum-vol">— kg</span></div>
+            <div class="summary-row"><span>Berat Tagihan</span><span id="sum-tagih">— kg</span></div>
+            <div style="height:1px; background:#e2e8f0; margin:14px 0"></div>
+            
+            <div class="summary-row"><span>Ongkir Utama Layanan</span><span id="sum-ongkir" style="font-weight:500">Rp 0</span></div>
+            <div class="summary-row"><span>Biaya Muatan Paket (70rb/kg)</span><span id="sum-biaya-barang" style="color:#0284c7; font-weight:500">Rp 0</span></div>
+            <div class="summary-row"><span>Asuransi Barang (0.2%)</span><span id="sum-asuransi">Rp 0</span></div>
+            <div class="summary-row"><span>Biaya Admin Sistem</span><span>Rp 2.000</span></div>
+            <div style="height:1px; background:#e2e8f0; margin:14px 0"></div>
+            <div class="summary-row" style="font-size:18px; font-weight:700">
+              <span>GRAND TOTAL</span>
+              <span id="sum-total" style="color:#F97316">Rp 2.000</span>
+            </div>
+            
+            <div style="margin-top:20px; background:rgba(249,115,22,0.06); border-radius:10px; padding:14px; border: 1px dashed rgba(249,115,22,0.3);">
+              <div style="font-size:12px; font-weight:600; color:#F97316; margin-bottom:4px">ℹ️ Sistem Sinkronisasi Aktif</div>
+              <div style="font-size:12px; color:#64748b; line-height: 1.4;">Nomor resi otomatis tersimpan ke data pelacakan lokal real-time.</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <div class="modal-overlay" id="success-modal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.6); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(4px);">
+    <div class="modal" style="background: #fff; padding: 32px; border-radius: 16px; max-width: 460px; width: 100%; box-sizing: border-box; margin: 20px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);">
+      <div style="text-align:center">
+        <div style="font-size:56px;margin-bottom:12px">✅</div>
+        <div style="font-size:22px;font-weight:700;margin-bottom:8px; color:#0f172a;">Pengiriman Berhasil Dibuat!</div>
+        <div style="color:#64748b;margin-bottom:16px">Nomor resi pendaftaran paket:</div>
+        <div id="modal-resi" style="font-family:'DM Mono',monospace;font-size:24px;font-weight:700;color:#F97316;background:rgba(249,115,22,0.08);padding:14px;border-radius:10px;letter-spacing:2px;margin-bottom:20px; border: 1px solid rgba(249,115,22,0.2);"></div>
+        <p style="font-size:13px;color:#64748b;margin-bottom:24px">Data otomatis terkirim dan tersinkronisasi langsung ke halaman pelacak paket.</p>
+        <div style="display:flex;gap:12px;justify-content:center">
+          <button class="btn btn-primary" onclick="closeModal()" style="padding: 12px 20px; background: #475569; color: #fff; border: none; border-radius:8px; font-weight: 600; cursor: pointer;">Tutup Form</button>
+          <a href="lacak.html" style="padding: 12px 20px; text-decoration: none; background: #F97316; color: #fff; border-radius: 8px; font-weight: 600; display: inline-block;">Lacak Sekarang →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .form-control-custom {
+      width: 100%;
+      padding: 10px 14px;
+      box-sizing: border-box;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      color: #334155;
+      background-color: #fff;
+      transition: all 0.2s ease;
+      margin-top: 6px;
+    }
+    .form-control-custom:focus {
+      outline: none;
+      border-color: #F97316;
+      box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
+    }
+    .form-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #475569;
+    }
+    .service-opt {
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+      background: #fff;
+    }
+    .service-opt:hover { border-color: #F97316; background: rgba(249,115,22,0.02); }
+    .service-opt.selected { border-color: #F97316; background: rgba(249,115,22,0.06); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+    .service-opt input { display: none; }
+    .service-name { font-size: 14px; font-weight: 700; margin-bottom: 4px; color: #1e293b; }
+    .service-desc { font-size: 11px; color: #64748b; margin-bottom: 8px; }
+    .service-price { font-size: 14px; font-weight: 700; color: #F97316; }
+    .summary-row { display:flex; justify-content:space-between; align-items:center; font-size:13px; padding:8px 0; color:#475569; }
+    textarea.form-control-custom { resize: vertical; }
+    .modal-overlay.open { display: flex !important; }
+  </style>
+
+  <script>
+    // Database Pemetaan Wilayah Indonesia Otomatis (Anti-Ketik Manual)
+    const databaseWilayah = {
+      "Jakarta": { provinsi: "DKI Jakarta", kodepos: "10110" },
+      "Bandung": { provinsi: "Jawa Barat", kodepos: "40111" },
+      "Surabaya": { provinsi: "Jawa Timur", kodepos: "60111" },
+      "Medan": { provinsi: "Sumatera Utara", kodepos: "20111" },
+      "Makassar": { provinsi: "Sulawesi Selatan", kodepos: "90111" },
+      "Yogyakarta": { provinsi: "DI Yogyakarta", kodepos: "55111" },
+      "Semarang": { provinsi: "Jawa Tengah", kodepos: "50111" },
+      "Palembang": { provinsi: "Sumatera Selatan", kodepos: "30111" },
+      "Denpasar": { provinsi: "Bali", kodepos: "80111" }
+    };
+
+    let selectedService = 'regular';
+    const rates = { regular: 7000, express: 12000, sameday: 18000 };
+
+    // Fungsi Otomatis Mengisi Provinsi dan Kode Pos
+    function autoFillWilayah(tipe) {
+      if (tipe === 'asal') {
+        const kotaAsal = document.getElementById('kota-asal').value;
+        const data = databaseWilayah[kotaAsal];
+        document.getElementById('prov-pengirim').value = data ? data.provinsi : '';
+        document.getElementById('pos-pengirim').value = data ? data.kodepos : '';
+        document.getElementById('sum-asal').textContent = kotaAsal || '—';
+      } else if (tipe === 'tujuan') {
+        const kotaTujuan = document.getElementById('kota-tujuan').value;
+        const data = databaseWilayah[kotaTujuan];
+        document.getElementById('prov-penerima').value = data ? data.provinsi : '';
+        document.getElementById('pos-penerima').value = data ? data.kodepos : '';
+        document.getElementById('sum-tujuan').textContent = kotaTujuan || '—';
+      }
+      hitungOngkir();
+    }
+
+    function selectService(s) {
+      selectedService = s;
+      document.querySelectorAll('.service-opt').forEach(el => el.classList.remove('selected'));
+      document.getElementById('opt-' + s).classList.add('selected');
+      document.getElementById('sum-service').textContent = {regular:'Regular', express:'Express', sameday:'Same Day'}[s];
+      hitungOngkir();
+    }
+
+    // Inisialisasi awal pilihan layanan
+    selectService('regular');
+
+    // Perhitungan Logika Ongkir Berdasarkan Aturan Kelipatan Berat 0.1 Kg
+    function hitungOngkir() {
+      const beratInput = parseFloat(document.getElementById('berat').value) || 0;
+      const p = parseFloat(document.getElementById('panjang').value) || 0;
+      const l = parseFloat(document.getElementById('lebar').value) || 0;
+      const t = parseFloat(document.getElementById('tinggi').value) || 0;
+      
+      // Rumus Volumetrik Cargo Standard
+      const vol = (p * l * t) / 6000;
+      const tagih = Math.max(beratInput, vol, 0.1);
+
+      document.getElementById('sum-berat').textContent = beratInput.toFixed(1) + ' kg';
+      document.getElementById('sum-vol').textContent = vol.toFixed(2) + ' kg';
+      document.getElementById('sum-tagih').textContent = tagih.toFixed(2) + ' kg';
+
+      // 1. Biaya Jasa Kurir Utama Layanan
+      const ongkirUtama = Math.ceil(tagih) * rates[selectedService];
+
+      // 2. Perhitungan Tambahan: Muatan Barang per kg (1 kg = 70.000, kelipatan 0.1 kg = 700)
+      // Rumus: Total kelipatan 0.1 kg dikali 700 rupiah
+      const jumlahKelipatan = Math.ceil(beratInput / 0.1);
+      const biayaMuatanBarang = jumlahKelipatan * 700;
+
+      // 3. Asuransi Barang (0.2%) & Biaya Admin Tetap
+      const nilaiBarang = parseFloat(document.getElementById('nilai-barang').value) || 0;
+      const asuransi = nilaiBarang * 0.002;
+      const totalSeluruhnya = ongkirUtama + biayaMuatanBarang + asuransi + 2000;
+
+      // Update Tampilan Harga pada Pilihan Tombol Layanan Kurir
+      ['regular','express','sameday'].forEach(s => {
+        const pEl = document.getElementById('price-' + s);
+        if (pEl) pEl.textContent = 'Rp ' + (Math.ceil(tagih) * rates[s]).toLocaleString('id-ID');
+      });
+
+      // Update Tampilan Rincian pada Panel Ringkasan Sebelah Kanan
+      document.getElementById('sum-ongkir').textContent = 'Rp ' + ongkirUtama.toLocaleString('id-ID');
+      document.getElementById('sum-biaya-barang').textContent = 'Rp ' + biayaMuatanBarang.toLocaleString('id-ID');
+      document.getElementById('sum-asuransi').textContent = 'Rp ' + Math.round(asuransi).toLocaleString('id-ID');
+      document.getElementById('sum-total').textContent = 'Rp ' + Math.round(totalSeluruhnya).toLocaleString('id-ID');
+    }
+
+    // Fungsi Validasi & Submit Data ke LocalStorage dengan Kunci 'pengiriman_list'
+    function submitPengiriman() {
+      const required = ['nama-pengirim','telp-pengirim','alamat-pengirim','kota-asal','nama-penerima','telp-penerima','alamat-penerima','kota-tujuan','nama-barang','berat'];
+      let valid = true;
+      
+      required.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          if (!el.value.trim()) { el.style.borderColor = '#EF4444'; valid = false; }
+          else el.style.borderColor = '';
+        }
+      });
+
+      if (!valid) { 
+        alert('Harap lengkapi seluruh kolom wajib bertanda bintang (*) sebelum memproses!');
+        return; 
+      }
+
+      // Membuat Kode Unik Resi Otomatis
+      const resi = 'GE-' + new Date().toISOString().slice(0,10).replace(/-/g,'') + '-' + Math.floor(Math.random()*900+100);
+      document.getElementById('modal-resi').textContent = resi;
+      document.getElementById('success-modal').classList.add('open');
+
+      const hariIni = new Date();
+      const tglFormat = String(hariIni.getDate()).padStart(2, '0') + '/' + String(hariIni.getMonth() + 1).padStart(2, '0') + '/' + hariIni.getFullYear();
+
+      // Struktur data lengkap agar terbaca sempurna di lacak.html
+      const paketBaru = {
+        resi: resi,
+        pengirim: document.getElementById('nama-pengirim').value,
+        penerima: document.getElementById('nama-penerima').value,
+        asal: document.getElementById('kota-asal').value,
+        tujuan: document.getElementById('kota-tujuan').value,
+        berat: document.getElementById('berat').value + ' kg',
+        layanan: selectedService.toUpperCase(),
+        status: 'pending',
+        tanggal: tglFormat,
+        eta: selectedService === 'sameday' ? 'Hari Ini Tiba' : (selectedService === 'express' ? '1-2 Hari' : '3-5 Hari'),
+        timeline: [
+          { icon: '📝', label: 'Pesanan Dibuat', desc: 'Pengiriman berhasil didaftarkan ke sistem.', time: tglFormat + ' Baru Saja', active: true },
+          { icon: '📦', label: 'Paket Diambil', desc: 'Menunggu Kurir Driver menjemput paket di lokasi pengirim.', time: '—', active: false },
+          { icon: '🚚', label: 'Dalam Perjalanan', desc: 'Menunggu...', time: '—', active: false },
+          { icon: '✅', label: 'Paket Diterima', desc: 'Menunggu...', time: '—', active: false }
+        ]
+      };
+
+      // PROSES SIMPAN SINKRONISASI
+      let listData = localStorage.getItem('pengiriman_list');
+      listData = listData ? JSON.parse(listData) : [];
+      listData.unshift(paketBaru); // Menyisipkan data terbaru di urutan paling atas
+      localStorage.setItem('pengiriman_list', JSON.stringify(listData));
+    }
+
+    function closeModal() {
+      document.getElementById('success-modal').classList.remove('open');
+      resetForm();
+    }
+
+    function resetForm() {
+      document.querySelectorAll('.form-control-custom').forEach(el => { el.value = ''; el.style.borderColor = ''; });
+      document.getElementById('sum-asal').textContent = '—';
+      document.getElementById('sum-tujuan').textContent = '—';
+      selectService('regular');
+      hitungOngkir();
+    }
+  </script>
+</body>
+</html>

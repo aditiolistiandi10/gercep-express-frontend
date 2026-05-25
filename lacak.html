@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gercep Express — Lacak Paket</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+</head>
+<body style="margin: 0; padding: 0; box-sizing: border-box;">
+
+  <aside class="sidebar" id="sidebar" style="position: fixed; top: 0; left: 0; bottom: 0; width: 260px; z-index: 100;">
+    <div class="sidebar-brand">
+      <div class="brand-icon">⚡</div>
+      <div>
+        <div class="brand-name">GERCEP</div>
+        <div class="brand-sub">EXPRESS</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="index.html" class="nav-item"><span class="nav-icon">◈</span><span>Dashboard</span></a>
+      <a href="pengiriman.html" class="nav-item"><span class="nav-icon">▶</span><span>Pengiriman</span></a>
+      <a href="lacak.html" class="nav-item active"><span class="nav-icon">◎</span><span>Lacak Paket</span></a>
+      <a href="riwayat.html" class="nav-item"><span class="nav-icon">≡</span><span>Riwayat</span></a>
+      <a href="laporan.html" class="nav-item"><span class="nav-icon">◉</span><span>Laporan</span></a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar">A</div>
+        <div><div class="user-name">Admin</div><div class="user-role">Super Admin</div></div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main-content" style="margin-left: 260px; min-height: 100vh; background-color: #f8fafc; display: block; overflow-x: hidden;">
+    <header class="topbar" style="padding: 16px 32px; background: #fff; border-bottom: 1px solid #e2e8f0;">
+      <div class="topbar-left">
+        <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+        <div class="page-title" style="font-weight: 600; font-size: 18px;">Lacak Paket</div>
+      </div>
+    </header>
+
+    <div style="padding: 28px 32px 40px; box-sizing: border-box;">
+      
+      <div class="tracking-box" style="background: #fff; padding: 24px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 24px;">
+        <h2 style="margin-top: 0; font-size: 20px;">🔍 Lacak Pengiriman Anda</h2>
+        <p style="color: var(--text-muted, #64748B); font-size: 14px; margin-bottom: 16px;">Masukkan nomor resi Gercep Express untuk melihat status paket terbaru</p>
+        <div class="track-input-row" style="display: flex; gap: 12px; max-width: 600px;">
+          <input type="text" id="resi-input" placeholder="Contoh: GE-20240521-001" style="flex: 1; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px;" />
+          <button class="btn btn-primary" onclick="lacakPaket()" style="white-space: nowrap; padding: 10px 20px; background: #F97316; color: #fff; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">Lacak Sekarang</button>
+        </div>
+      </div>
+
+      <div id="tracking-result" style="display: none;">
+        <div class="card" style="background: #fff; padding: 24px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid #e2e8f0; flex-wrap: wrap; gap: 12px;">
+            <div>
+              <div style="font-size: 12px; color: var(--text-muted, #64748B); margin-bottom: 4px; letter-spacing: 0.5px;">NOMOR RESI</div>
+              <div class="mono" style="font-size: 20px; font-weight: 700; font-family: 'DM Mono', monospace;" id="result-resi">GE-20240521-001</div>
+            </div>
+            <div id="result-badge"></div>
+          </div>
+          
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px;">
+            <div>
+              <div style="font-size: 11px; color: var(--text-muted, #64748B); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 1px;">Pengirim</div>
+              <div style="font-weight: 600;" id="result-pengirim">-</div>
+            </div>
+            <div>
+              <div style="font-size: 11px; color: var(--text-muted, #64748B); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 1px;">Penerima</div>
+              <div style="font-weight: 600;" id="result-penerima">-</div>
+            </div>
+            <div>
+              <div style="font-size: 11px; color: var(--text-muted, #64748B); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 1px;">Rute</div>
+              <div style="font-weight: 600;" id="result-rute">-</div>
+            </div>
+            <div>
+              <div style="font-size: 11px; color: var(--text-muted, #64748B); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 1px;">Estimasi Tiba</div>
+              <div style="font-weight: 600; color: #F97316;" id="result-eta">-</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="background: #fff; padding: 24px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+          <div class="card-title" style="margin-bottom: 20px; font-weight: 600; font-size: 16px;">📍 Status Pengiriman</div>
+          <div class="timeline" id="tracking-timeline"></div>
+        </div>
+      </div>
+
+      <div id="tracking-notfound" style="display: none;">
+        <div class="card" style="text-align: center; padding: 48px; background: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+          <div style="font-size: 48px; margin-bottom: 16px;">😕</div>
+          <div style="font-size: 18px; font-weight: 700; margin-bottom: 8px;">Resi Tidak Ditemukan</div>
+          <div style="color: var(--text-muted, #64748B);">Pastikan nomor resi yang Anda masukkan benar atau sudah terdaftar.</div>
+        </div>
+      </div>
+      
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+  <script>
+    // 1. Data Demo Statis Bawaan
+    const DEMO_PACKAGES = {
+      'GE-20240521-001': {
+        pengirim: 'Budi Santoso', penerima: 'Dewi Lestari',
+        asal: 'Jakarta', tujuan: 'Surabaya',
+        berat: '2.5 kg', layanan: 'Regular',
+        status: 'delivered', eta: '23 Mei 2024',
+        timeline: [
+          { icon:'✅', label:'Paket Diterima', desc:'Paket berhasil diterima oleh kurir tujuan.', time:'23 Mei 2024, 14:30', active:true },
+          { icon:'🏠', label:'Di Gudang Tujuan', desc:'Paket tiba di gudang Surabaya Rungkut.', time:'23 Mei 2024, 08:15', active:true },
+          { icon:'🚚', label:'Dalam Perjalanan', desc:'Paket sedang dalam perjalanan menuju kota tujuan.', time:'22 Mei 2024, 22:00', active:true },
+          { icon:'🏭', label:'Di Gudang Transit', desc:'Paket transit di gudang Semarang Hub.', time:'22 Mei 2024, 11:00', active:true },
+          { icon:'📦', label:'Paket Diambil', desc:'Kurir mengambil paket dari pengirim.', time:'21 Mei 2024, 09:00', active:true },
+          { icon:'📝', label:'Pesanan Dibuat', desc:'Pengiriman berhasil didaftarkan ke sistem.', time:'21 Mei 2024, 08:30', active:true },
+        ]
+      },
+      'GE-20240521-002': {
+        pengirim: 'Siti Rahayu', penerima: 'Ahmad Fauzi',
+        asal: 'Bandung', tujuan: 'Medan',
+        berat: '1.2 kg', layanan: 'Express',
+        status: 'transit', eta: '22 Mei 2024',
+        timeline: [
+          { icon:'🚚', label:'Dalam Perjalanan', desc:'Paket sedang dalam perjalanan menuju Medan.', time:'21 Mei 2024, 18:00', active:true },
+          { icon:'🏭', label:'Di Gudang Transit', desc:'Paket transit di gudang Medan Hub.', time:'21 Mei 2024, 10:00', active:true },
+          { icon:'📦', label:'Paket Diambil', desc:'Kurir mengambil paket dari pengirim.', time:'21 Mei 2024, 07:30', active:true },
+          { icon:'📝', label:'Pesanan Dibuat', desc:'Pengiriman berhasil didaftarkan ke sistem.', time:'21 Mei 2024, 07:00', active:true },
+          { icon:'🏠', label:'Di Gudang Tujuan', desc:'Menunggu kedatangan...', time:'—', active:false },
+          { icon:'✅', label:'Paket Diterima', desc:'Menunggu kedatangan...', time:'—', active:false },
+        ]
+      }
+    };
+
+    const statusBadge = {
+      delivered: '<span style="background: #DCFCE7; color: #166534; font-size:13px; padding:6px 16px; border-radius:20px; font-weight:600">✅ Terkirim</span>',
+      transit:   '<span style="background: #FEF3C7; color: #92400E; font-size:13px; padding:6px 16px; border-radius:20px; font-weight:600">🚚 Dalam Perjalanan</span>',
+      pending:   '<span style="background: #E0F2FE; color: #0369A1; font-size:13px; padding:6px 16px; border-radius:20px; font-weight:600">🕐 Menunggu Pickup</span>',
+    };
+
+    function lacakPaket() {
+      const resi = document.getElementById('resi-input').value.trim().toUpperCase();
+      
+      // Sembunyikan hasil lama
+      document.getElementById('tracking-result').style.display = 'none';
+      document.getElementById('tracking-notfound').style.display = 'none';
+
+      if (!resi) return;
+
+      let data = null;
+
+      // Cek apakah data ada di LocalStorage (dari pengiriman/riwayat)
+      const localData = localStorage.getItem('pengiriman_list');
+      if (localData) {
+        const listData = JSON.parse(localData);
+        // Cari paket yang memiliki resi sesuai inputan
+        const found = listData.find(item => item.resi.toUpperCase() === resi);
+        if (found) {
+          // Format ulang objek agar pas dengan struktur layout pencarian
+          data = {
+            pengirim: found.pengirim || 'Admin Gercep',
+            penerima: found.penerima,
+            asal: found.asal || 'Jakarta Hub',
+            tujuan: found.tujuan,
+            status: found.status || 'pending',
+            eta: found.eta || 'Hari Ini',
+            timeline: found.timeline || [
+              { icon:'📝', label:'Pesanan Dibuat', desc:'Pengiriman terdaftar melalui dashboard.', time: found.tanggal || 'Baru Saja', active:true },
+              { icon:'📦', label:'Paket Diambil', desc:'Menunggu Kurir Driver menjemput paket.', time:'—', active:false }
+            ]
+          };
+        }
+      }
+
+      // Jika di LocalStorage tidak ada, ambil dari data demo statis di atas
+      if (!data) {
+        data = DEMO_PACKAGES[resi];
+      }
+
+      // Jika data tetap tidak ketemu, tampilkan "Not Found"
+      if (!data) {
+        document.getElementById('tracking-notfound').style.display = 'block';
+        return;
+      }
+
+      // Tampilkan Data Ke Elemen HTML
+      document.getElementById('result-resi').textContent = resi;
+      document.getElementById('result-badge').innerHTML = statusBadge[data.status] || statusBadge['pending'];
+      document.getElementById('result-pengirim').textContent = data.pengirim;
+      document.getElementById('result-penerima').textContent = data.penerima;
+      document.getElementById('result-rute').textContent = `${data.asal} → ${data.tujuan}`;
+      document.getElementById('result-eta').textContent = data.eta;
+
+      // Render Baris Jalur Linimasa/Timeline
+      const tl = document.getElementById('tracking-timeline');
+      tl.innerHTML = '';
+      data.timeline.forEach((item) => {
+        tl.innerHTML += `
+          <div class="timeline-item" style="display: flex; gap: 16px; margin-bottom: 20px; position: relative;">
+            <div class="tl-dot" style="font-size: 20px; opacity: ${item.active ? '1' : '0.4'}">${item.icon}</div>
+            <div class="tl-content">
+              <div class="tl-title" style="font-weight: 600; color: ${item.active ? '#1e293b' : '#94a3b8'}">${item.label}</div>
+              <div class="tl-desc" style="font-size: 13px; color: #64748b; margin: 2px 0 4px;">${item.desc}</div>
+              <div class="tl-time" style="font-size: 11px; color: #94a3b8;">${item.time}</div>
+            </div>
+          </div>`;
+      });
+
+      document.getElementById('tracking-result').style.display = 'block';
+    }
+
+    // Mengizinkan eksekusi tombol Enter saat mengetik nomor resi
+    document.getElementById('resi-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') lacakPaket();
+    });
+  </script>
+</body>
+</html>

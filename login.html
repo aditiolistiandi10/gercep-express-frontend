@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Autentikasi Gercep Express</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Space Grotesk', sans-serif;
+      background-color: #f8fafc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .auth-container {
+      background: #ffffff;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+      width: 100%;
+      max-width: 420px;
+      box-sizing: border-box;
+    }
+    .logo-section {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .logo-icon { font-size: 44px; margin-bottom: 6px; }
+    .logo-text { font-size: 24px; font-weight: 700; color: #0f172a; margin: 0; }
+    .logo-sub { font-size: 13px; color: #F97316; font-weight: 600; letter-spacing: 2px; }
+
+    /* Switcher Utama: Login vs Sign Up */
+    .mode-switcher {
+      display: flex;
+      border-bottom: 2px solid #e2e8f0;
+      margin-bottom: 24px;
+    }
+    .mode-btn {
+      flex: 1;
+      padding: 12px;
+      background: none;
+      border: none;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 600;
+      color: #64748b;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+    .mode-btn.active {
+      color: #F97316;
+      border-bottom: 2px solid #F97316;
+      margin-bottom: -2px;
+    }
+
+    /* Pilihan Role Dropdown / Selector */
+    .form-group {
+      text-align: left;
+      margin-bottom: 16px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #475569;
+      margin-bottom: 6px;
+    }
+    .form-control {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      box-sizing: border-box;
+      color: #1e293b;
+      transition: all 0.2s;
+    }
+    .form-control:focus {
+      outline: none;
+      border-color: #F97316;
+      box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 13px;
+      background: #0f172a;
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 12px;
+      transition: background 0.2s;
+    }
+    .btn-submit:hover { background: #1e293b; }
+    
+    .alert-box {
+      font-size: 13px;
+      font-weight: 500;
+      padding: 10px 14px;
+      border-radius: 6px;
+      margin-bottom: 16px;
+      display: none;
+      text-align: left;
+    }
+    .alert-danger { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
+    .alert-success { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+  </style>
+</head>
+<body>
+
+  <div class="auth-container">
+    <div class="logo-section">
+      <div class="logo-icon">⚡</div>
+      <h1 class="logo-text">GERCEP</h1>
+      <div class="logo-sub">EXPRESS</div>
+    </div>
+
+    <div class="mode-switcher">
+      <button class="mode-btn active" id="tab-login" onclick="switchMode('login')">Masuk</button>
+      <button class="mode-btn" id="tab-signup" onclick="switchMode('signup')">Daftar Akun</button>
+    </div>
+
+    <div id="alert-msg" class="alert-box"></div>
+
+    <form id="authForm" onsubmit="handleSubmit(event)">
+      <div class="form-group" id="group-fullname" style="display: none;">
+        <label>Nama Lengkap *</label>
+        <input type="text" id="fullname" class="form-control" placeholder="Masukkan nama lengkap Anda">
+      </div>
+
+      <div class="form-group">
+        <label>Username *</label>
+        <input type="text" id="username" class="form-control" placeholder="Buat atau masukkan username" required>
+      </div>
+
+      <div class="form-group">
+        <label>Password *</label>
+        <input type="password" id="password" class="form-control" placeholder="Masukkan password" required>
+      </div>
+
+      <div class="form-group">
+        <label>Tipe Pengguna (Role) *</label>
+        <select id="role" class="form-control" required>
+          <option value="Pelanggan">Pelanggan (Kirim & Lacak Paket)</option>
+          <option value="JasaKirim">Pihak Jasa Kirim (Petugas/Admin)</option>
+        </select>
+      </div>
+
+      <button type="submit" id="submit-btn" class="btn-submit">Masuk Aplikasi</button>
+    </form>
+  </div>
+
+  <script>
+    let currentMode = 'login';
+
+    // Inisialisasi Database Lokal jika belum ada sama sekali di komputer user
+    if (!localStorage.getItem('gercep_user_database')) {
+      localStorage.setItem('gercep_user_database', JSON.stringify([]));
+    }
+
+    function switchMode(mode) {
+      currentMode = mode;
+      const tabLogin = document.getElementById('tab-login');
+      const tabSignup = document.getElementById('tab-signup');
+      const groupFullName = document.getElementById('group-fullname');
+      const submitBtn = document.getElementById('submit-btn');
+      const alertBox = document.getElementById('alert-msg');
+      
+      alertBox.style.display = 'none';
+      document.getElementById('authForm').reset();
+
+      if (mode === 'login') {
+        tabLogin.classList.add('active');
+        tabSignup.classList.remove('active');
+        groupFullName.style.display = 'none';
+        document.getElementById('fullname').removeAttribute('required');
+        submitBtn.textContent = 'Masuk Aplikasi';
+      } else {
+        tabLogin.classList.remove('active');
+        tabSignup.classList.add('active');
+        groupFullName.style.display = 'block';
+        document.getElementById('fullname').setAttribute('required', 'required');
+        submitBtn.textContent = 'Daftar Akun Baru';
+      }
+    }
+
+    function showAlert(text, type) {
+      const alertBox = document.getElementById('alert-msg');
+      alertBox.textContent = text;
+      alertBox.className = 'alert-box ' + (type === 'success' ? 'alert-success' : 'alert-danger');
+      alertBox.style.display = 'block';
+    }
+
+    function handleSubmit(event) {
+      event.preventDefault();
+      
+      const usernameVal = document.getElementById('username').value.trim().toLowerCase();
+      const passwordVal = document.getElementById('password').value;
+      const roleVal = document.getElementById('role').value;
+      
+      // Ambil data terbaru dari Database Lokal (localStorage)
+      let userDb = JSON.parse(localStorage.getItem('gercep_user_database'));
+
+      if (currentMode === 'signup') {
+        const fullnameVal = document.getElementById('fullname').value.trim();
+
+        // Validasi: Apakah username sudah terdaftar?
+        const isExist = userDb.some(user => user.username === usernameVal);
+        if (isExist) {
+          showAlert('Username sudah digunakan! Pilih nama lain.', 'danger');
+          return;
+        }
+
+        // Proses Penyimpanan ke Database
+        const newUser = {
+          fullname: fullnameVal,
+          username: usernameVal,
+          password: passwordVal, // Disimpan aman pada lingkup database lokal localstorage browser
+          role: roleVal
+        };
+
+        userDb.push(newUser);
+        localStorage.setItem('gercep_user_database', JSON.stringify(userDb));
+        
+        showAlert('Pendaftaran Berhasil! Silakan klik tab "Masuk".', 'success');
+        setTimeout(() => { switchMode('login'); }, 1200);
+
+      } else {
+        // PROSES LOGIN
+        const matchedUser = userDb.find(user => 
+          user.username === usernameVal && 
+          user.password === passwordVal && 
+          user.role === roleVal
+        );
+
+        if (matchedUser) {
+          // Menyimpan session login aktif saat ini
+          localStorage.setItem('currentUser', JSON.stringify({
+            name: matchedUser.fullname,
+            username: matchedUser.username,
+            role: matchedUser.role
+          }));
+
+          showAlert('Login Berhasil! Mengalihkan...', 'success');
+          
+          // Alur Pengalihan Halaman Sesuai Hak Akses Pengguna
+          setTimeout(() => {
+            if (matchedUser.role === 'JasaKirim') {
+              window.location.href = 'laporan.html'; // Admin/Jasa Kirim ke panel laporan/dashboard
+            } else {
+              window.location.href = 'lacak.html';   // Pelanggan diarahkan langsung ke tracking paket
+            }
+          }, 800);
+        } else {
+          showAlert('Kombinasi Username, Password, atau Tipe Pengguna salah!', 'danger');
+        }
+      }
+    }
+  </script>
+</body>
+</html>
